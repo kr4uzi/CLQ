@@ -40,9 +40,24 @@ struct keyboard_impl
 	end:
 		return CallNextHookEx(nullptr, nCode, wParam, lParam);
 	}
+
+	static std::string keycode_to_string(keyboard::keycode vkey)
+	{
+		auto scode = MapVirtualKeyEx(vkey, 0, GetKeyboardLayout(0));
+		char key_name[32];
+		if (GetKeyNameText(scode << 16, key_name, sizeof(key_name)) == 0)
+			return "";
+
+		return std::string(key_name);
+	}
 };
 
 keyboard * keyboard::instance = nullptr;
+
+std::string keyboard::to_string(keycode vkey)
+{
+	return keyboard_impl::keycode_to_string(vkey);
+}
 
 keyboard * keyboard::initialize(boost::asio::io_service& service)
 {

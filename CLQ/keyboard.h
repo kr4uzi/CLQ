@@ -18,6 +18,7 @@ public:
 	};
 
 	typedef unsigned int keycode;
+	static std::string to_string(keycode vkey);
 
 private:
 	std::thread thread;
