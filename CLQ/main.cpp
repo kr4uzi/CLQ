@@ -17,6 +17,12 @@ int main()
 		interval = boost::posix_time::milliseconds(cfg.get_unsinged("interval", 20));
 		button = (cfg.get_string("button", "right") == "right") ? mouse::button::RIGHT : mouse::button::LEFT;
 		hotkey = cfg.get_unsinged("hotkey", 0x91);
+
+		if (keyboard::to_string(hotkey).empty())
+		{
+			std::cout << "invalid hotkey detected, falling back to 0x91" << std::endl;
+			hotkey = 0x91;
+		}
 	}
 	else
 	{
@@ -42,6 +48,7 @@ int main()
 	std::cout << "The click interval is [" << interval.total_milliseconds() << "] ms" << std::endl;
 	std::cout << "The [" << ((button == mouse::button::RIGHT) ? "right" : "left") << "] mouse button will be clicked" << std::endl;
 	std::cout << std::endl;
+	std::cout << "Status: not clicking" << '\r';
 
 	boost::asio::io_service io;
 	mouse m(io, button, interval);
@@ -50,16 +57,16 @@ int main()
 	keyboard::get_instance()->set_scroll_lock(false);
 	keyboard::get_instance()->on_key_press.connect([&](keyboard::message msg, keyboard::keycode vkey)
 	{
-		if (msg == keyboard::message::KEYUP && vkey == 1)
+		if (msg == keyboard::message::KEYUP && vkey == hotkey)
 		{
 			if (m.is_clicking())
 			{
-				std::cout << "State: clicking    " << "\r";
+				std::cout << "Status: not clicking" << '\r';
 				m.click_stop();
 			}
 			else
 			{
-				std::cout << "State: not clicking" << "\r";
+				std::cout << "Status: clicking    " << '\r';
 				m.click_start();
 			}
 		}
