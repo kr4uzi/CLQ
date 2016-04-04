@@ -11,7 +11,7 @@ int main()
 	keyboard::keycode hotkey = 0x91;	// VK_SCROLL
 
 	config cfg;
-	auto parse_error = config::parse("clq.cfg", cfg);
+	auto parse_error = config::parse("autoclicker.cfg", cfg);
 	if (!parse_error && cfg.exists("interval") && cfg.exists("button") && cfg.exists("hotkey"))
 	{
 		interval = boost::posix_time::milliseconds(cfg.get_unsinged("interval", 20));
@@ -26,12 +26,12 @@ int main()
 	}
 	else
 	{
-		std::cout << "There has been an error parsing [clq.cfg]!" << std::endl;
-		std::cout << "Creating [clq.cfg] with default values." << std::endl;
+		std::cout << "There has been an error parsing [autoclicker.cfg]!" << std::endl;
+		std::cout << "Creating [autoclicker.cfg] with default values." << std::endl;
 		std::cout << "Proceeding with default values." << std::endl;
 		std::cout << std::endl;
 
-		std::ofstream of("clq.cfg", std::ios::trunc);
+		std::ofstream of("autoclicker.cfg", std::ios::trunc);
 		of << "# click interval in miliseconds" << std::endl;
 		of << "interval = 20" << std::endl;
 		of << std::endl;
