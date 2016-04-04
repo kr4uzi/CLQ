@@ -28,8 +28,8 @@ mouse::mouse(boost::asio::io_service& service, const button& btn, const boost::p
 {
 #ifdef WIN32
 	auto input = new INPUT;
-	input->type = INPUT_MOUSE;
 	ZeroMemory(input, sizeof(INPUT));
+	input->type = INPUT_MOUSE;
 	this->input = input;
 #endif
     
