@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CLQ", "CLQ\CLQ.vcxproj", "{F54D0D98-ED05-4804-86B8-278AF1212F4E}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "autoclicker", "autoclicker\autoclicker.vcxproj", "{F54D0D98-ED05-4804-86B8-278AF1212F4E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
