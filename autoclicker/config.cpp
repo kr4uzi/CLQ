@@ -65,13 +65,13 @@ double config::get_double(const std::string& key, double default_value) const
 unsigned config::get_unsinged(const std::string& key, unsigned default_value) const
 {
 	if (!exists(key)) return default_value;
-	return std::stoul(cfg.find(key)->second, nullptr, 0);
+	return (unsigned)std::stoul(cfg.find(key)->second, nullptr, 0);
 }
 
 signed config::get_signed(const std::string& key, signed default_value) const
 {
 	if (!exists(key)) return default_value;
-	return std::stol(cfg.find(key)->second, nullptr, 0);
+	return (signed)std::stol(cfg.find(key)->second, nullptr, 0);
 }
 
 bool config::get_bool(const std::string& key, bool default_value) const
