@@ -41,7 +41,7 @@ int main()
 		std::cout << std::endl;
 
 		std::ofstream of("autoclicker.cfg", std::ios::trunc);
-		of << "# click interval in miliseconds" << std::endl;
+		of << "# click interval in milliseconds" << std::endl;
 		of << "interval = 20" << std::endl;
 		of << std::endl;
 		of << "# button to autoclick: left or right" << std::endl;
@@ -61,7 +61,7 @@ int main()
 	std::cout << "The click interval is [" << interval.total_milliseconds() << "] ms" << std::endl;
 	std::cout << "The [" << ((button == mouse::button::RIGHT) ? "right" : "left") << "] mouse button will be clicked" << std::endl;
 	std::cout << std::endl;
-	std::cout << "Status: not clicking" << '\r';
+    std::cout << "Status: not clicking" << '\r' << std::flush;
 
 	boost::asio::io_service io;
 	mouse m(io, button, interval);
@@ -74,12 +74,12 @@ int main()
 		{
 			if (m.is_clicking())
 			{
-				std::cout << "Status: not clicking" << '\r';
+				std::cout << "Status: not clicking" << '\r' << std::flush;
 				m.click_stop();
 			}
 			else
 			{
-				std::cout << "Status: clicking    " << '\r';
+				std::cout << "Status: clicking    " << '\r' << std::flush;
 				m.click_start();
 			}
 		}
