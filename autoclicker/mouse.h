@@ -19,8 +19,6 @@ private:
 	boost::posix_time::time_duration interval;
 
 	bool clicking = false;
-
-	void * input = nullptr;
 	const void * flags;
 
 public:

@@ -27,22 +27,15 @@ mouse::mouse(boost::asio::io_service& service, const button& btn, const boost::p
 	: service(service), work(service), timer(service), interval(interval)
 {
 #ifdef WIN32
-	auto input = new INPUT;
-	ZeroMemory(input, sizeof(INPUT));
-	input->type = INPUT_MOUSE;
-	this->input = input;
-#endif
-    
+    this->flags = (btn == button::LEFT) ? input_flags : input_flags + 2;
+#elif defined(__APPLE__)
     this->flags = (btn == button::LEFT) ? input_flags : input_flags + 1;
+#endif
 }
 
 mouse::~mouse()
 {
 	clicking = false;
-
-#ifdef WIN32
-	delete (INPUT *)input;
-#endif
 }
 
 void mouse::click_start()
@@ -62,13 +55,15 @@ void mouse::loop()
 	service.post([this]()
 	{
 #ifdef WIN32
-		auto input = (INPUT *)this->input;
-		auto flags = (flags_t *)this->flags;
-
-		input->mi.dwFlags = flags[0];
-		SendInput(1, input, sizeof(INPUT));
-		input->mi.dwFlags = flags[1];
-		SendInput(1, input, sizeof(INPUT));
+        INPUT input[2];
+        ZeroMemory(input, sizeof(input));
+        input[0].type = input[1].type = INPUT_MOUSE;
+        
+        auto flags = (flags_t *)this->flags;
+        input[0].mi.dwFlags = flags[0];
+        input[1].mi.dwFlags = flags[1];
+        
+        SendInput(2, input, sizeof(INPUT));
 #elif defined(__APPLE__)
         auto flags = (flags_t *)this->flags;
         CGEventRef event = CGEventCreate(nullptr);
