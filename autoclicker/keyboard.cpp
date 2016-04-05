@@ -170,7 +170,7 @@ void keyboard::loop()
     
     if (!eventTap)
     {
-        std::fprintf(stderr, "failed to create eventtap!");
+        std::fprintf(stderr, "failed to create eventtap (insufficient privileges)!");
         std::exit(1);
     }
     
