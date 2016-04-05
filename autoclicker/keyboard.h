@@ -28,6 +28,10 @@ private:
 	bool running = true;
 
 	static keyboard * instance;
+    
+#ifdef __APPLE__
+    void * _loop;
+#endif
 
 public:
 	static keyboard * initialize(boost::asio::io_service& service);

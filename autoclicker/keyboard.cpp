@@ -137,6 +137,7 @@ keyboard * keyboard::get_instance()
 	return instance;
 }
 
+std::thread::id main_thread_id = std::this_thread::get_id();
 keyboard::keyboard(boost::asio::io_service& service)
 	: service(service), work(service)
 {
@@ -146,6 +147,9 @@ keyboard::keyboard(boost::asio::io_service& service)
 keyboard::~keyboard()
 {
 	running = false;
+#ifdef __APPLE__
+    CFRunLoopStop((CFRunLoopRef)_loop);
+#endif
 	thread.join();
 }
 
@@ -153,15 +157,18 @@ void keyboard::loop()
 {
 #ifdef WIN32
 	auto hook = SetWindowsHookEx(WH_KEYBOARD_LL, keyboard_impl::LowLevelKeyboardProc, nullptr, 0);
-	if (hook)
-	{
-		MSG msg;
-		while (running && GetMessage(&msg, nullptr, 0, 0))
-		{
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		}
-	}
+    if (!hook)
+    {
+        std::fprintf(stderr, "failed to install global keyhook!");
+        exit(1);
+    }
+	
+    MSG msg;
+    while (running && GetMessage(&msg, nullptr, 0, 0))
+    {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
 
 	UnhookWindowsHookEx(hook);
 #elif defined(__APPLE__)
@@ -176,9 +183,11 @@ void keyboard::loop()
     
     
     CFRunLoopSourceRef runLoopSource = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, eventTap, 0);
+    this->_loop = CFRunLoopGetCurrent();
     CFRunLoopAddSource(CFRunLoopGetCurrent(), runLoopSource, kCFRunLoopCommonModes);
     CGEventTapEnable(eventTap, true);
     CFRunLoopRun();
+    CFRelease(runLoopSource);
 #endif
 	running = false;
 }
@@ -207,16 +216,17 @@ void keyboard::set_scroll_lock(bool flag)
 
 		SendInput(2, input, sizeof(INPUT));
 #elif defined(__APPLE__)
-        CGEventSourceRef source = CGEventSourceCreate(kCGEventSourceStateCombinedSessionState);
-        CGEventRef saveCommandDown = CGEventCreateKeyboardEvent(source, (CGKeyCode)0x91, true);
-        CGEventRef saveCommandUp = CGEventCreateKeyboardEvent(source, (CGKeyCode)0x91, false);
+        // even on my hackintosh with a full PS/2 mouse, setting the scroll lock led doesnt work (it just not recognized by the system)
+        //CGEventSourceRef source = CGEventSourceCreate(kCGEventSourceStateCombinedSessionState);
+        //CGEventRef saveCommandDown = CGEventCreateKeyboardEvent(source, (CGKeyCode)0x91, true);
+        //CGEventRef saveCommandUp = CGEventCreateKeyboardEvent(source, (CGKeyCode)0x91, false);
         
-        CGEventPost(kCGAnnotatedSessionEventTap, saveCommandDown);
-        CGEventPost(kCGAnnotatedSessionEventTap, saveCommandUp);
+        //CGEventPost(kCGAnnotatedSessionEventTap, saveCommandDown);
+        //CGEventPost(kCGAnnotatedSessionEventTap, saveCommandUp);
         
-        CFRelease(saveCommandUp);
-        CFRelease(saveCommandDown);
-        CFRelease(source);
+        //CFRelease(saveCommandUp);
+        //CFRelease(saveCommandDown);
+        //CFRelease(source);
 #endif
     }
 }
